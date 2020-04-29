@@ -62,8 +62,17 @@ class MoleculeDatapoint:
             replace_token = 0
             self.features = np.where(np.isnan(self.features), replace_token, self.features)
 
+#        print (line)
+#        print (len(line))
+#        print ([line[2]])
         # Create targets
-        self.targets = [float(x) if x != '' else None for x in line[1:]]
+#        self.targets = [float(x) if x != '' else None for x in line[1:]]
+        self.targets = [float(x) if x != '' else None for x in [line[1]]]
+	
+        if len(line)>2 :
+            self.weights = [float(x) if x != '' else None for x in [line[2]]]
+        else: 
+            self.weights = [float(1.0)]
 
     def set_features(self, features: np.ndarray):
         """
@@ -121,7 +130,17 @@ class MoleculeDataset(Dataset):
         :return: A list of smiles strings.
         """
         return [d.smiles for d in self.data]
+   
+
+    def weights(self) -> List[str]:
+        """
+        Returns the smiles strings associated with the molecules.
+
+        :return: A list of smiles strings.
+        """
+        return [d.weights for d in self.data]
     
+ 
     def mols(self) -> List[Chem.Mol]:
         """
         Returns the RDKit molecules associated with the molecules.

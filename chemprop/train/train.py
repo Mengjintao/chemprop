@@ -80,15 +80,22 @@ def train(model: nn.Module,
         if i + args.batch_size > len(data):
             break
         mol_batch = MoleculeDataset(data[i:i + args.batch_size])
-        smiles_batch, features_batch, target_batch = mol_batch.smiles(), mol_batch.features(), mol_batch.targets()
+        smiles_batch, features_batch, target_batch, weight_batch = mol_batch.smiles(), mol_batch.features(), mol_batch.targets(), mol_batch.weights()
         batch = smiles_batch
         mask = torch.Tensor([[x is not None for x in tb] for tb in target_batch])
         targets = torch.Tensor([[0 if x is None else x for x in tb] for tb in target_batch])
+        weights = torch.Tensor([[0 if x is None else x for x in tb] for tb in weight_batch])
+#        print (weight_batch)
+#        print (weights)
 
         if next(model.parameters()).is_cuda:
             mask, targets = mask.cuda(), targets.cuda()
 
-        class_weights = torch.ones(targets.shape)
+        if args.enable_weight :
+            class_weights = weights
+        else:
+            class_weights = torch.ones(targets.shape)
+#        print(class_weights)
 
         if args.cuda:
             class_weights = class_weights.cuda()

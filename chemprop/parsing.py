@@ -58,6 +58,8 @@ def add_train_args(parser: ArgumentParser):
                         help='Which GPU to use')
     parser.add_argument('--data_path', type=str,
                         help='Path to data CSV file')
+    parser.add_argument('--enable_weight', action='store_true', default=True,
+                        help='Enable weights for labels on each record')
     parser.add_argument('--use_compound_names', action='store_true', default=False,
                         help='Use when test data file contains compound names in addition to SMILES strings')
     parser.add_argument('--max_data_size', type=int,
@@ -137,7 +139,7 @@ def add_train_args(parser: ArgumentParser):
                              'file will override arguments specified via the command line or by the defaults.')
 
     # Training arguments
-    parser.add_argument('--epochs', type=int, default=30,
+    parser.add_argument('--epochs', type=int, default=60,
                         help='Number of epochs to run')
     parser.add_argument('--batch_size', type=int, default=50,
                         help='Batch size')
