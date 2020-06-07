@@ -1,0 +1,44 @@
+#!/bin/bash
+batch=(64 32 16)
+hidsize=(9 11 13)
+
+data=$1
+feat=$2
+
+workdir=$3
+outpath=$workdir
+modelpath=$workdir'model'
+
+mkdir $outpath
+mkdir $modelpath
+
+echo $data $feat $outpath $modelpath
+
+id=0
+seed=0
+
+for index in {0..8}
+do
+        seed=$((index/9))
+        i=$((index%9))
+	batch_id=$((i%3)) 
+	hid_id=$((i/3))
+	batch_size=${batch[$batch_id]}
+	hidden_size=${hidsize[$hid_id]}
+        
+	for ffn_num_layers in 2 3
+        do
+#		for ffn_hidden_size in 7 9 11
+#                do
+                        for depth in 2 3 
+                        do
+					echo $id
+                                        name="./$outpath/"$batch_size"_"$hidden_size"_"$ffn_num_layers"_"$depth"_"$seed".txt"
+                                        model="./$modelpath/"$batch_size"_"$hidden_size"_"$ffn_num_layers"_"$depth"_"$seed"_model.pt"
+                        		echo $name   		
+					sbatch -p szsc szbatch_2.sh $batch_size  $hidden_size $ffn_num_layers $depth $seed $model $name $data $feat
+					id=$((id+1))
+#			done
+         	done
+         done
+done
