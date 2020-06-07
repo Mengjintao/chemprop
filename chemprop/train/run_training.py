@@ -138,7 +138,7 @@ def run_training(args: Namespace, logger: Logger = None) -> List[float]:
     metric_func = get_metric_func(metric=args.metric)
 
     # Set up test set evaluation
-    test_smiles, test_targets = test_data.smiles(), test_data.targets()
+    test_smiles, test_targets, test_weights = test_data.smiles(), test_data.targets(), test_data.weights()
     if args.dataset_type == 'multiclass':
         sum_test_preds = np.zeros((len(test_smiles), args.num_tasks, args.multiclass_num_classes))
     else:
@@ -199,7 +199,8 @@ def run_training(args: Namespace, logger: Logger = None) -> List[float]:
                 model=model,
                 data=val_data,
                 num_tasks=args.num_tasks,
-                metric_func=metric_func,
+               metric_func=metric_func,
+#                metric_func=loss_func,
                 batch_size=args.batch_size,
                 dataset_type=args.dataset_type,
                 scaler=scaler,
@@ -236,8 +237,10 @@ def run_training(args: Namespace, logger: Logger = None) -> List[float]:
         test_scores = evaluate_predictions(
             preds=test_preds,
             targets=test_targets,
+            weights=test_weights,
             num_tasks=args.num_tasks,
             metric_func=metric_func,
+#            metric_func=loss_func,
             dataset_type=args.dataset_type,
             logger=logger
         )
@@ -262,8 +265,10 @@ def run_training(args: Namespace, logger: Logger = None) -> List[float]:
     ensemble_scores = evaluate_predictions(
         preds=avg_test_preds,
         targets=test_targets,
+        weights=test_weights,
         num_tasks=args.num_tasks,
         metric_func=metric_func,
+#        metric_func=loss_func,
         dataset_type=args.dataset_type,
         logger=logger
     )

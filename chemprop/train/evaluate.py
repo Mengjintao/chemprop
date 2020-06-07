@@ -1,14 +1,16 @@
 import logging
 from typing import Callable, List
-
+import torch
 import torch.nn as nn
-
+import math
+import numpy
 from .predict import predict
 from chemprop.data import MoleculeDataset, StandardScaler
 
 
-def evaluate_predictions(preds: List[List[float]],
+def evaluate_predictions(preds:   List[List[float]],
                          targets: List[List[float]],
+                         weights: List[List[float]],
                          num_tasks: int,
                          metric_func: Callable,
                          dataset_type: str,
@@ -59,11 +61,18 @@ def evaluate_predictions(preds: List[List[float]],
         if len(valid_targets[i]) == 0:
             continue
 
-        if dataset_type == 'multiclass':
-            results.append(metric_func(valid_targets[i], valid_preds[i], labels=list(range(len(valid_preds[i][0])))))
-        else:
-            results.append(metric_func(valid_targets[i], valid_preds[i]))
+        mask = torch.Tensor([[x is not None for x in tb] for tb in targets])
+        preds = torch.Tensor([[0 if x is None else x for x in tb] for tb in preds])
+        targs = torch.Tensor([[0 if x is None else x for x in tb] for tb in targets])
+        weigs = torch.Tensor([[0 if x is None else x for x in tb] for tb in weights])
+#        loss = math.sqrt( torch.sum((preds - targs) ** 2) / len(targets))
+        loss = math.sqrt( torch.sum(( (preds - targs) ** 2) * weigs * mask) / len(targets) )
+        results.append(loss)
 
+#        if dataset_type == 'multiclass':
+#            results.append(metric_func(valid_targets[i], valid_preds[i], labels=list(range(len(valid_preds[i][0])))))
+#        else:
+#            results.append(metric_func(valid_targets[i], valid_preds[i]))
     return results
 
 
@@ -96,10 +105,12 @@ def evaluate(model: nn.Module,
     )
 
     targets = data.targets()
+    weights = data.weights()
 
     results = evaluate_predictions(
         preds=preds,
         targets=targets,
+        weights=weights,
         num_tasks=num_tasks,
         metric_func=metric_func,
         dataset_type=dataset_type,

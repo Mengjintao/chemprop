@@ -37,6 +37,7 @@ def cross_validate(args: Namespace, logger: Logger = None) -> Tuple[float, float
 
     # Report scores for each fold
     for fold_num, scores in enumerate(all_scores):
+        print (fold_num, scores)
         info(f'Seed {init_seed + fold_num} ==> test {args.metric} = {np.nanmean(scores):.6f}')
 
         if args.show_individual_scores:

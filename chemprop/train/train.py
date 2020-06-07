@@ -97,6 +97,7 @@ def train(model: nn.Module,
             class_weights = torch.ones(targets.shape)
 #        print(class_weights)
 
+
         if args.cuda:
             class_weights = class_weights.cuda()
 
@@ -109,6 +110,10 @@ def train(model: nn.Module,
             loss = torch.cat([loss_func(preds[:, target_index, :], targets[:, target_index]).unsqueeze(1) for target_index in range(preds.size(1))], dim=1) * class_weights * mask
         else:
             loss = loss_func(preds, targets) * class_weights * mask
+#        print ("loss")
+#        print (loss)
+#        print (class_weights)
+
         loss = loss.sum() / mask.sum()
 
         loss_sum += loss.item()
