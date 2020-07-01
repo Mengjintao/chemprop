@@ -37,6 +37,7 @@ do
                                         model="./$modelpath/"$batch_size"_"$hidden_size"_"$ffn_num_layers"_"$depth"_"$seed"_model.pt"
                         		echo $name   		
 					sbatch -p szsc szbatch_2.sh $batch_size  $hidden_size $ffn_num_layers $depth $seed $model $name $data $feat
+					#sbatch -p szsc szbatch_2_sca.sh $batch_size  $hidden_size $ffn_num_layers $depth $seed $model $name $data $feat
 					id=$((id+1))
 #			done
          	done

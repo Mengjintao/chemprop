@@ -1,0 +1,1 @@
+ python predict.py --features_generator rdkit_2d_normalized  --no_features_scaling --checkpoint_dir chembl_Sol_cure1_randommodel/16_13_3_3_0_model.pt11 --gpu 1 --test_path ../../mpnn_hyper/test_bdz.csv --preds_path 123.txt 
